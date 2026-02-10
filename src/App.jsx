@@ -1,10 +1,15 @@
 import React from "react";
-import Homepage from "../components/Homepage.jsx";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import Homepage from "./components/Homepage.jsx";
 
 export default function App() {
   return (
-    <div>
-      <Homepage />
-    </div>
+    <Router>
+      <div>
+        <Routes>
+          <Route path="/" element={<Homepage />} />
+        </Routes>
+      </div>
+    </Router>
   );
 }
