@@ -3,105 +3,111 @@ import { Link } from "react-router-dom";
 import "./Homepage.css";
 
 export default function Homepage() {
-  // New Arrivals Data
+  // New Arrivals Data with Unsplash Images
   const newArrivals = [
     {
       id: 1,
       name: "Elegance Flow Dress",
       price: 89.99,
-      image: "/images/dress.jpg",
+      image:
+        "https://images.unsplash.com/photo-1595777457583-95e059d581b8?w=400&h=500&fit=crop",
       category: "Dresses",
     },
     {
       id: 2,
       name: "Urban Explorer Backpack",
       price: 59.99,
-      image: "/images/backpack.jpg",
+      image:
+        "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=400&h=500&fit=crop",
       category: "Accessories",
     },
     {
       id: 3,
       name: "Dynamic Fit Sneakers",
       price: 74.99,
-      image: "/images/sneakers.jpg",
+      image:
+        "https://images.unsplash.com/photo-1549298916-b41d501d3772?w=400&h=500&fit=crop",
       category: "Shoes",
     },
     {
       id: 4,
       name: "Serene Knit Sweater",
       price: 65.0,
-      image: "/images/sweater.jpg",
+      image:
+        "https://images.unsplash.com/photo-1576566588028-4147f3842f27?w=400&h=500&fit=crop",
       category: "Tops",
     },
   ];
 
-  // Best Sellers Data
   const bestSellers = [
     {
       id: 5,
       name: "Classic Denim Jacket",
       price: 99.99,
-      image: "/images/denim-jacket.jpg",
+      image:
+        "https://images.unsplash.com/photo-1543076659-9380cdf10613?w=400&h=500&fit=crop",
       category: "Jackets",
     },
     {
       id: 6,
       name: "Minimalist Leather Wallet",
       price: 34.99,
-      image: "/images/wallet.jpg",
+      image:
+        "https://images.unsplash.com/photo-1627123424574-724758594e93?w=400&h=500&fit=crop",
       category: "Accessories",
     },
     {
       id: 7,
       name: "Comfort Stretch Jeans",
       price: 79.99,
-      image: "/images/jeans.jpg",
+      image:
+        "https://images.unsplash.com/photo-1541099649105-f69ad21f3246?w=400&h=500&fit=crop",
       category: "Bottoms",
     },
     {
       id: 8,
       name: "Timeless Watch Collection",
       price: 120.0,
-      image: "/images/watch.jpg",
+      image:
+        "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=400&h=500&fit=crop",
       category: "Accessories",
     },
   ];
 
-  // Categories Data
+  // Categories Data with Unsplash Images
   const categories = [
     {
       id: 1,
       name: "Handbags",
-      image: "/images/handbags.jpg",
+      image:
+        "https://images.unsplash.com/photo-1584917865442-de89df76afd3?w=400&h=400&fit=crop",
       link: "/shop/handbags",
     },
     {
       id: 2,
       name: "Apparel",
-      image: "/images/apparel.jpg",
+      image:
+        "https://images.unsplash.com/photo-1489987707025-afc232f7ea0f?w=400&h=400&fit=crop",
       link: "/shop/apparel",
     },
     {
       id: 3,
       name: "Accessories",
-      image: "/images/accessories.jpg",
+      image:
+        "https://images.unsplash.com/photo-1610701596007-11502861dcfa?w=400&h=400&fit=crop",
       link: "/shop/accessories",
     },
     {
       id: 4,
       name: "Footwear",
-      image: "/images/footwear.jpg",
+      image:
+        "https://images.unsplash.com/photo-1460353581641-37baddab0fa2?w=400&h=400&fit=crop",
       link: "/shop/footwear",
     },
   ];
 
   return (
     <div className="homepage">
-      <div
-        style={{ padding: "1rem", background: "#ffdede", textAlign: "center" }}
-      >
-        DEBUG: Homepage component rendered
-      </div>
       {/* Hero Section */}
       <section className="hero-section">
         <div className="hero-content">
@@ -121,7 +127,7 @@ export default function Homepage() {
           </div>
           <div className="hero-image">
             <img
-              src="/images/hero-model.jpg"
+              src="https://images.unsplash.com/photo-1483985988355-763728e1935b?w=600&h=800&fit=crop"
               alt="Fashion model in elegant attire"
               className="model-image"
             />
@@ -225,20 +231,6 @@ export default function Homepage() {
               </div>
             </div>
           ))}
-        </div>
-      </section>
-
-      {/* Newsletter Section */}
-      <section className="newsletter-section">
-        <div className="newsletter-content">
-          <h2 className="newsletter-title">Join Our Community</h2>
-          <p className="newsletter-description">
-            Sign up for our newsletter to get exclusive offers, style tips, and
-            updates on new collections.
-          </p>
-          <Link to="/shop" className="newsletter-button">
-            Browse All Products
-          </Link>
         </div>
       </section>
     </div>
