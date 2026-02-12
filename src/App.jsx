@@ -1,19 +1,23 @@
 import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import Homepage from "./components/Homepage.jsx";
-import Footer from "./components/Footer.jsx";
-import Header from "./components/Header.jsx";
+import Header from "./components/Header";
+import Homepage from "./components/Homepage";
+import CategoryListing from "./components/CategoryListing";
+import ProductDetail from "./components/ProductDetail";
+import Cart from "./components/Cart";
+import Footer from "./components/Footer";
 
 export default function App() {
   return (
     <Router>
-      <div>
-        <Header />
-        <Routes>
-          <Route path="/" element={<Homepage />} />
-        </Routes>
-        <Footer />
-      </div>
+      <Header />
+      <Routes>
+        <Route path="/" element={<Homepage />} />
+        <Route path="/shop" element={<CategoryListing />} />
+        <Route path="/product" element={<ProductDetail />} />
+        <Route path="/cart" element={<Cart />} />
+      </Routes>
+      <Footer />
     </Router>
   );
 }
