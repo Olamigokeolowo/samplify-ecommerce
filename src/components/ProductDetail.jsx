@@ -1,14 +1,19 @@
-import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { Link, useParams } from "react-router-dom";
+import API from "./services/api";
 import "./ProductDetail.css";
 
 export default function ProductDetail() {
+  const { id } = useParams();
+  const [product, setProduct] = useState(null);
+  const [relatedProducts, setRelatedProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [quantity, setQuantity] = useState(1);
-  const [selectedColor, setSelectedColor] = useState("Black");
-  const [selectedSize, setSelectedSize] = useState("One Size");
+  const [selectedColor, setSelectedColor] = useState("");
+  const [selectedSize, setSelectedSize] = useState("");
   const [mainImage, setMainImage] = useState(0);
 
-  // Product images
+  // Product images (you can make this dynamic later)
   const productImages = [
     "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=600&h=600&fit=crop",
     "https://images.unsplash.com/photo-1484704849700-f032a568e944?w=600&h=600&fit=crop",
@@ -16,43 +21,43 @@ export default function ProductDetail() {
     "https://images.unsplash.com/photo-1487215078519-e21cc028cb29?w=600&h=600&fit=crop",
   ];
 
-  // Related products
-  const relatedProducts = [
-    {
-      id: 1,
-      name: "Aura ANC Earbuds",
-      price: 149.99,
-      image:
-        "https://images.unsplash.com/photo-1590658268037-6bf12165a8df?w=400&h=400&fit=crop",
-    },
-    {
-      id: 2,
-      name: "Harmony Pro Speaker",
-      price: 199.99,
-      image:
-        "https://images.unsplash.com/photo-1608043152269-423dbba4e7e1?w=400&h=400&fit=crop",
-    },
-    {
-      id: 3,
-      name: "Zenith Sport Earbuds",
-      price: 89.99,
-      image:
-        "https://images.unsplash.com/photo-1606841837239-c5a1a4a07af7?w=400&h=400&fit=crop",
-    },
-    {
-      id: 4,
-      name: "Echo Mini Soundbar",
-      price: 249.99,
-      image:
-        "https://images.unsplash.com/photo-1545454675-3531b543be5d?w=400&h=400&fit=crop",
-    },
-  ];
+  useEffect(() => {
+    fetchProductData();
+  }, [id]);
+
+  const fetchProductData = async () => {
+    try {
+      setLoading(true);
+      const [productData, relatedData] = await Promise.all([
+        API.getProductById(id),
+        API.getAllProducts({ limit: 4 }),
+      ]);
+
+      setProduct(productData);
+      setSelectedColor(productData.color);
+      setSelectedSize(productData.size);
+      setRelatedProducts(relatedData.filter((p) => p.id !== parseInt(id)));
+    } catch (error) {
+      console.error("Error fetching product:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleQuantityChange = (action) => {
     if (action === "increase") {
       setQuantity(quantity + 1);
     } else if (action === "decrease" && quantity > 1) {
       setQuantity(quantity - 1);
+    }
+  };
+
+  const handleAddToCart = async () => {
+    try {
+      await API.addToCart(parseInt(id), quantity);
+      alert(`Added ${quantity} ${product.name} to cart!`);
+    } catch (error) {
+      alert("Failed to add to cart. Please try again.");
     }
   };
 
@@ -67,6 +72,26 @@ export default function ProductDetail() {
     }
     return stars;
   };
+
+  if (loading) {
+    return (
+      <div className="product-detail-page">
+        <div style={{ textAlign: "center", padding: "50px" }}>
+          Loading product...
+        </div>
+      </div>
+    );
+  }
+
+  if (!product) {
+    return (
+      <div className="product-detail-page">
+        <div style={{ textAlign: "center", padding: "50px" }}>
+          Product not found
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="product-detail-page">
@@ -93,25 +118,23 @@ export default function ProductDetail() {
 
           {/* Product Info */}
           <div className="product-info-section">
-            <h1 className="product-title">
-              Voyager Xtreme Wireless Headphones
-            </h1>
+            <h1 className="product-title">{product.name}</h1>
 
             {/* Rating */}
             <div className="product-rating">
-              <div className="stars">{renderStars(4)}</div>
-              <span className="rating-text">4.8 (128 reviews)</span>
+              <div className="stars">{renderStars(product.rating)}</div>
+              <span className="rating-text">
+                {product.rating} ({product.reviews} reviews)
+              </span>
             </div>
 
             {/* Price */}
-            <div className="product-price">$299.99</div>
+            <div className="product-price">${product.price.toFixed(2)}</div>
 
             {/* Description */}
             <p className="product-description">
-              Experience unparalleled sound quality and comfort with the Voyager
-              Xtreme Wireless Headphones. Featuring advanced noise-cancellation,
-              long-lasting battery life, and ergonomic design for extended
-              listening sessions. Perfect for audiophiles and travelers alike.
+              {product.description ||
+                "Premium quality product with excellent features."}
             </p>
 
             {/* Color Selection */}
@@ -122,31 +145,13 @@ export default function ProductDetail() {
               <div className="color-options">
                 <button
                   className={
-                    selectedColor === "Black" ? "color-btn active" : "color-btn"
-                  }
-                  onClick={() => setSelectedColor("Black")}
-                >
-                  Black
-                </button>
-                <button
-                  className={
-                    selectedColor === "Space Gray"
+                    selectedColor === product.color
                       ? "color-btn active"
                       : "color-btn"
                   }
-                  onClick={() => setSelectedColor("Space Gray")}
+                  onClick={() => setSelectedColor(product.color)}
                 >
-                  Space Gray
-                </button>
-                <button
-                  className={
-                    selectedColor === "Navy Blue"
-                      ? "color-btn active"
-                      : "color-btn"
-                  }
-                  onClick={() => setSelectedColor("Navy Blue")}
-                >
-                  Navy Blue
+                  {product.color}
                 </button>
               </div>
             </div>
@@ -159,11 +164,13 @@ export default function ProductDetail() {
               <div className="size-options">
                 <button
                   className={
-                    selectedSize === "One Size" ? "size-btn active" : "size-btn"
+                    selectedSize === product.size
+                      ? "size-btn active"
+                      : "size-btn"
                   }
-                  onClick={() => setSelectedSize("One Size")}
+                  onClick={() => setSelectedSize(product.size)}
                 >
-                  One Size
+                  {product.size}
                 </button>
               </div>
             </div>
@@ -184,7 +191,9 @@ export default function ProductDetail() {
 
             {/* Add to Cart & Wishlist */}
             <div className="product-actions">
-              <button className="add-to-cart-btn">Add to Cart</button>
+              <button className="add-to-cart-btn" onClick={handleAddToCart}>
+                Add to Cart
+              </button>
               <button className="wishlist-btn" aria-label="Add to Wishlist">
                 <svg
                   viewBox="0 0 24 24"
@@ -207,18 +216,22 @@ export default function ProductDetail() {
         <div className="related-products-container">
           <h2 className="section-title">Related Products</h2>
           <div className="related-products-grid">
-            {relatedProducts.map((product) => (
-              <div key={product.id} className="related-product-card">
+            {relatedProducts.slice(0, 4).map((relatedProduct) => (
+              <Link
+                to={`/product/${relatedProduct.id}`}
+                key={relatedProduct.id}
+                className="related-product-card"
+              >
                 <div className="related-product-image">
-                  <img src={product.image} alt={product.name} />
+                  <img src={relatedProduct.image} alt={relatedProduct.name} />
                 </div>
                 <div className="related-product-info">
-                  <h3>{product.name}</h3>
+                  <h3>{relatedProduct.name}</h3>
                   <p className="related-product-price">
-                    ${product.price.toFixed(2)}
+                    ${relatedProduct.price.toFixed(2)}
                   </p>
                 </div>
-              </div>
+              </Link>
             ))}
           </div>
         </div>

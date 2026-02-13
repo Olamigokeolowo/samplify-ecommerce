@@ -1,159 +1,41 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
+import API from "./services/api";
 import "./CategoryListing.css";
 
 export default function CategoryListing() {
+  const [products, setProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [sortBy, setSortBy] = useState("featured");
   const [currentPage, setCurrentPage] = useState(1);
   const totalPages = 3;
 
-  // Sample products data
-  const products = [
-    {
-      id: 1,
-      name: "Smart Speaker Echo X",
-      price: 129.99,
-      originalPrice: null,
-      image:
-        "https://images.unsplash.com/photo-1589492477829-5e65395b66cc?w=400&h=400&fit=crop",
-      category: "Electronics",
-      brand: "TechCo",
-      rating: 4.5,
-      reviews: 128,
-    },
-    {
-      id: 2,
-      name: "Wireless Headphones Pro",
-      price: 99.0,
-      originalPrice: 149.0,
-      image:
-        "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=400&h=400&fit=crop",
-      category: "Electronics",
-      brand: "SoundWave",
-      rating: 4.8,
-      reviews: 342,
-    },
-    {
-      id: 3,
-      name: "Gaming Mouse RGB",
-      price: 59.99,
-      originalPrice: null,
-      image:
-        "https://images.unsplash.com/photo-1527864550417-7fd91fc51a46?w=400&h=400&fit=crop",
-      category: "Electronics",
-      brand: "GadgetZone",
-      rating: 4.3,
-      reviews: 89,
-    },
-    {
-      id: 4,
-      name: "Smart Watch Series 5",
-      price: 199.99,
-      originalPrice: 249.0,
-      image:
-        "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=400&h=400&fit=crop",
-      category: "Electronics",
-      brand: "TechCo",
-      rating: 4.7,
-      reviews: 256,
-    },
-    {
-      id: 5,
-      name: "Portable Power Bank 20000mAh",
-      price: 35.0,
-      originalPrice: null,
-      image:
-        "https://images.unsplash.com/photo-1609091839311-d5365f9ff1c5?w=400&h=400&fit=crop",
-      category: "Electronics",
-      brand: "PowerUp",
-      rating: 4.6,
-      reviews: 178,
-    },
-    {
-      id: 6,
-      name: "Bluetooth Speaker Mini",
-      price: 49.99,
-      originalPrice: null,
-      image:
-        "https://images.unsplash.com/photo-1608043152269-423dbba4e7e1?w=400&h=400&fit=crop",
-      category: "Electronics",
-      brand: "SoundWave",
-      rating: 4.4,
-      reviews: 92,
-    },
-    {
-      id: 7,
-      name: "Drone with 4K Camera",
-      price: 349.99,
-      originalPrice: 449.0,
-      image:
-        "https://images.unsplash.com/photo-1473968512647-3e447244af8f?w=400&h=400&fit=crop",
-      category: "Electronics",
-      brand: "SkyView",
-      rating: 4.5,
-      reviews: 76,
-    },
-    {
-      id: 8,
-      name: "Ergonomic Mechanical Keyboard",
-      price: 89.99,
-      originalPrice: null,
-      image:
-        "https://images.unsplash.com/photo-1587829741301-dc798b83add3?w=400&h=400&fit=crop",
-      category: "Electronics",
-      brand: "TypeMaster",
-      rating: 4.7,
-      reviews: 203,
-    },
-    {
-      id: 9,
-      name: "HD Webcam 1080p",
-      price: 29.99,
-      originalPrice: null,
-      image:
-        "https://images.unsplash.com/photo-1626668893632-6f3a4466d22f?w=400&h=400&fit=crop",
-      category: "Electronics",
-      brand: "CamTech",
-      rating: 4.2,
-      reviews: 67,
-    },
-    {
-      id: 10,
-      name: "Laptop Backpack Stylish",
-      price: 45.0,
-      originalPrice: null,
-      image:
-        "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=400&h=400&fit=crop",
-      category: "Accessories",
-      brand: "TravelPro",
-      rating: 4.6,
-      reviews: 145,
-    },
-    {
-      id: 11,
-      name: "Fast Wireless Charger Pad",
-      price: 24.99,
-      originalPrice: null,
-      image:
-        "https://images.unsplash.com/photo-1591290619762-c588f5768a50?w=400&h=400&fit=crop",
-      category: "Electronics",
-      brand: "ChargeFast",
-      rating: 4.5,
-      reviews: 112,
-    },
-    {
-      id: 12,
-      name: "Smart Home Hub",
-      price: 79.99,
-      originalPrice: null,
-      image:
-        "https://images.unsplash.com/photo-1558089687-6ec4c0a934d5?w=400&h=400&fit=crop",
-      category: "Electronics",
-      brand: "HomeList",
-      rating: 4.4,
-      reviews: 98,
-    },
-  ];
+  useEffect(() => {
+    fetchProducts();
+  }, []);
+
+  const fetchProducts = async () => {
+    try {
+      setLoading(true);
+      // You can add filters here, e.g., { category: "Electronics" }
+      const data = await API.getAllProducts({ category: "Electronics" });
+      setProducts(data);
+    } catch (error) {
+      console.error("Error fetching products:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleAddToCart = async (e, productId) => {
+    e.preventDefault();
+    try {
+      await API.addToCart(productId, 1);
+      alert("Added to cart!");
+    } catch (error) {
+      alert("Failed to add to cart. Please try again.");
+    }
+  };
 
   const handlePageChange = (page) => {
     if (page >= 1 && page <= totalPages) {
@@ -173,6 +55,16 @@ export default function CategoryListing() {
     }
     return stars;
   };
+
+  if (loading) {
+    return (
+      <div className="category-list-page">
+        <div style={{ textAlign: "center", padding: "50px" }}>
+          Loading products...
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="category-list-page">
@@ -309,7 +201,9 @@ export default function CategoryListing() {
         <main className="products-main">
           {/* Header */}
           <div className="products-header">
-            <h2 className="products-title">Electronics (12 Products)</h2>
+            <h2 className="products-title">
+              Electronics ({products.length} Products)
+            </h2>
             <div className="sort-dropdown">
               <label>Sort by:</label>
               <select
@@ -350,18 +244,15 @@ export default function CategoryListing() {
                     <span className="product-price">
                       ${product.price.toFixed(2)}
                     </span>
-                    {product.originalPrice && (
+                    {product.original_price && (
                       <span className="original-price">
-                        ${product.originalPrice.toFixed(2)}
+                        ${product.original_price.toFixed(2)}
                       </span>
                     )}
                   </div>
                   <button
                     className="add-to-cart-btn"
-                    onClick={(e) => {
-                      e.preventDefault();
-                      alert("Added to cart!");
-                    }}
+                    onClick={(e) => handleAddToCart(e, product.id)}
                   >
                     Add to Cart
                   </button>

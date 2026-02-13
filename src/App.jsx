@@ -6,7 +6,6 @@ import CategoryListing from "./components/CategoryListing";
 import ProductDetail from "./components/ProductDetail";
 import Cart from "./components/Cart";
 import Footer from "./components/Footer";
-
 export default function App() {
   return (
     <Router>

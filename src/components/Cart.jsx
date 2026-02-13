@@ -1,74 +1,86 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
+import API from "./services/api";
 import "./Cart.css";
 
 export default function Cart() {
-  const [cartItems, setCartItems] = useState([
-    {
-      id: 1,
-      name: "Wireless Headphones Pro",
-      price: 99.0,
-      quantity: 1,
-      image:
-        "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=300&h=300&fit=crop",
-      color: "Black",
-      size: "One Size",
-    },
-    {
-      id: 2,
-      name: "Smart Watch Series 5",
-      price: 199.99,
-      quantity: 2,
-      image:
-        "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=300&h=300&fit=crop",
-      color: "Space Gray",
-      size: "42mm",
-    },
-    {
-      id: 3,
-      name: "Bluetooth Speaker Mini",
-      price: 49.99,
-      quantity: 1,
-      image:
-        "https://images.unsplash.com/photo-1608043152269-423dbba4e7e1?w=300&h=300&fit=crop",
-      color: "Blue",
-      size: "Standard",
-    },
-  ]);
+  const [cartItems, setCartItems] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [summary, setSummary] = useState({
+    subtotal: 0,
+    tax: 0,
+    total: 0,
+  });
 
-  const updateQuantity = (id, action) => {
-    setCartItems(
-      cartItems.map((item) => {
-        if (item.id === id) {
-          if (action === "increase") {
-            return { ...item, quantity: item.quantity + 1 };
-          } else if (action === "decrease" && item.quantity > 1) {
-            return { ...item, quantity: item.quantity - 1 };
-          }
-        }
-        return item;
-      }),
+  useEffect(() => {
+    fetchCart();
+  }, []);
+
+  const fetchCart = async () => {
+    try {
+      setLoading(true);
+      const [items, summaryData] = await Promise.all([
+        API.getCart(),
+        API.getCartSummary(),
+      ]);
+      setCartItems(items);
+      setSummary({
+        subtotal: summaryData.subtotal,
+        tax: summaryData.tax,
+        total: summaryData.total,
+      });
+      setError(null);
+    } catch (err) {
+      setError("Failed to load cart. Please try again.");
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const updateQuantity = async (id, action) => {
+    try {
+      await API.updateCartQuantity(id, action);
+      await fetchCart(); // Refresh cart
+    } catch (err) {
+      console.error("Failed to update quantity:", err);
+      alert("Failed to update quantity. Please try again.");
+    }
+  };
+
+  const removeItem = async (id) => {
+    try {
+      await API.removeFromCart(id);
+      await fetchCart(); // Refresh cart
+    } catch (err) {
+      console.error("Failed to remove item:", err);
+      alert("Failed to remove item. Please try again.");
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="cart-page">
+        <div className="cart-container">
+          <div className="loading">Loading cart...</div>
+        </div>
+      </div>
     );
-  };
+  }
 
-  const removeItem = (id) => {
-    setCartItems(cartItems.filter((item) => item.id !== id));
-  };
-
-  const calculateSubtotal = () => {
-    return cartItems.reduce(
-      (total, item) => total + item.price * item.quantity,
-      0,
+  if (error) {
+    return (
+      <div className="cart-page">
+        <div className="cart-container">
+          <div className="error-message">{error}</div>
+          <button onClick={fetchCart} className="retry-btn">
+            Retry
+          </button>
+        </div>
+      </div>
     );
-  };
-
-  const calculateTax = () => {
-    return calculateSubtotal() * 0.1; // 10% tax
-  };
-
-  const calculateTotal = () => {
-    return calculateSubtotal() + calculateTax();
-  };
+  }
 
   return (
     <div className="cart-page">
@@ -147,11 +159,11 @@ export default function Cart() {
               <h2>Order Summary</h2>
               <div className="summary-row">
                 <span>Subtotal</span>
-                <span>${calculateSubtotal().toFixed(2)}</span>
+                <span>${summary.subtotal.toFixed(2)}</span>
               </div>
               <div className="summary-row">
                 <span>Tax (10%)</span>
-                <span>${calculateTax().toFixed(2)}</span>
+                <span>${summary.tax.toFixed(2)}</span>
               </div>
               <div className="summary-row">
                 <span>Shipping</span>
@@ -160,7 +172,7 @@ export default function Cart() {
               <div className="summary-divider"></div>
               <div className="summary-row total">
                 <span>Total</span>
-                <span>${calculateTotal().toFixed(2)}</span>
+                <span>${summary.total.toFixed(2)}</span>
               </div>
               <button className="checkout-btn">Proceed to Checkout</button>
               <Link to="/shop" className="continue-link">

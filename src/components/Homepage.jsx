@@ -1,110 +1,55 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
+import API from "./services/api";
 import "./Homepage.css";
 
 export default function Homepage() {
-  // New Arrivals Data with Unsplash Images
-  const newArrivals = [
-    {
-      id: 1,
-      name: "Elegance Flow Dress",
-      price: 89.99,
-      image:
-        "https://images.unsplash.com/photo-1595777457583-95e059d581b8?w=400&h=500&fit=crop",
-      category: "Dresses",
-    },
-    {
-      id: 2,
-      name: "Urban Explorer Backpack",
-      price: 59.99,
-      image:
-        "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=400&h=500&fit=crop",
-      category: "Accessories",
-    },
-    {
-      id: 3,
-      name: "Dynamic Fit Sneakers",
-      price: 74.99,
-      image:
-        "https://images.unsplash.com/photo-1549298916-b41d501d3772?w=400&h=500&fit=crop",
-      category: "Shoes",
-    },
-    {
-      id: 4,
-      name: "Serene Knit Sweater",
-      price: 65.0,
-      image:
-        "https://images.unsplash.com/photo-1576566588028-4147f3842f27?w=400&h=500&fit=crop",
-      category: "Tops",
-    },
-  ];
+  const [categories, setCategories] = useState([]);
+  const [newArrivals, setNewArrivals] = useState([]);
+  const [bestSellers, setBestSellers] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  const bestSellers = [
-    {
-      id: 5,
-      name: "Classic Denim Jacket",
-      price: 99.99,
-      image:
-        "https://images.unsplash.com/photo-1543076659-9380cdf10613?w=400&h=500&fit=crop",
-      category: "Jackets",
-    },
-    {
-      id: 6,
-      name: "Minimalist Leather Wallet",
-      price: 34.99,
-      image:
-        "https://images.unsplash.com/photo-1627123424574-724758594e93?w=400&h=500&fit=crop",
-      category: "Accessories",
-    },
-    {
-      id: 7,
-      name: "Comfort Stretch Jeans",
-      price: 79.99,
-      image:
-        "https://images.unsplash.com/photo-1541099649105-f69ad21f3246?w=400&h=500&fit=crop",
-      category: "Bottoms",
-    },
-    {
-      id: 8,
-      name: "Timeless Watch Collection",
-      price: 120.0,
-      image:
-        "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=400&h=500&fit=crop",
-      category: "Accessories",
-    },
-  ];
+  useEffect(() => {
+    fetchData();
+  }, []);
 
-  // Categories Data with Unsplash Images
-  const categories = [
-    {
-      id: 1,
-      name: "Handbags",
-      image:
-        "https://images.unsplash.com/photo-1584917865442-de89df76afd3?w=400&h=400&fit=crop",
-      link: "/shop/handbags",
-    },
-    {
-      id: 2,
-      name: "Apparel",
-      image:
-        "https://images.unsplash.com/photo-1489987707025-afc232f7ea0f?w=400&h=400&fit=crop",
-      link: "/shop/apparel",
-    },
-    {
-      id: 3,
-      name: "Accessories",
-      image:
-        "https://images.unsplash.com/photo-1610701596007-11502861dcfa?w=400&h=400&fit=crop",
-      link: "/shop/accessories",
-    },
-    {
-      id: 4,
-      name: "Footwear",
-      image:
-        "https://images.unsplash.com/photo-1460353581641-37baddab0fa2?w=400&h=400&fit=crop",
-      link: "/shop/footwear",
-    },
-  ];
+  const fetchData = async () => {
+    try {
+      setLoading(true);
+      // Fetch all data in parallel
+      const [categoriesData, newArrivalsData, bestSellersData] =
+        await Promise.all([
+          API.getCategories(),
+          API.getNewArrivals(),
+          API.getBestsellers(),
+        ]);
+
+      setCategories(categoriesData);
+      setNewArrivals(newArrivalsData);
+      setBestSellers(bestSellersData);
+    } catch (error) {
+      console.error("Error fetching homepage data:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleAddToCart = async (productId) => {
+    try {
+      await API.addToCart(productId, 1);
+      alert("Added to cart!");
+    } catch (_) {
+      alert("Failed to add to cart. Please try again.");
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="homepage">
+        <div style={{ textAlign: "center", padding: "50px" }}>Loading...</div>
+      </div>
+    );
+  }
 
   return (
     <div className="homepage">
@@ -186,7 +131,12 @@ export default function Homepage() {
                   alt={product.name}
                   className="product-image"
                 />
-                <button className="quick-view-btn">Quick View</button>
+                <button
+                  className="quick-view-btn"
+                  onClick={() => handleAddToCart(product.id)}
+                >
+                  Add to Cart
+                </button>
               </div>
               <div className="product-info">
                 <h3 className="product-name">{product.name}</h3>
@@ -223,7 +173,12 @@ export default function Homepage() {
                   alt={product.name}
                   className="product-image"
                 />
-                <button className="quick-view-btn">Quick View</button>
+                <button
+                  className="quick-view-btn"
+                  onClick={() => handleAddToCart(product.id)}
+                >
+                  Add to Cart
+                </button>
               </div>
               <div className="product-info">
                 <h3 className="product-name">{product.name}</h3>
