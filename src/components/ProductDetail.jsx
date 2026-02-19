@@ -1,10 +1,13 @@
 import React, { useState, useEffect } from "react";
-import { Link, useParams } from "react-router-dom";
+import { Link, useParams, useNavigate } from "react-router-dom";
+import { useCart } from "../contexts/CartContext";
 import API from "./services/api";
 import "./ProductDetail.css";
 
 export default function ProductDetail() {
   const { id } = useParams();
+  const navigate = useNavigate();
+  const { addToCart } = useCart();
   const [product, setProduct] = useState(null);
   const [relatedProducts, setRelatedProducts] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -52,12 +55,29 @@ export default function ProductDetail() {
     }
   };
 
-  const handleAddToCart = async () => {
-    try {
-      await API.addToCart(parseInt(id), quantity);
-      alert(`Added ${quantity} ${product.name} to cart!`);
-    } catch (error) {
-      alert("Failed to add to cart. Please try again.");
+  const handleAddToCart = () => {
+    if (!product) return;
+    
+    addToCart(
+      {
+        id: product.id,
+        name: product.name,
+        price: product.price,
+        image: productImages[0],
+      },
+      quantity,
+      {
+        color: selectedColor,
+        size: selectedSize,
+      }
+    );
+    
+    // Show success message and option to go to cart
+    const goToCart = window.confirm(
+      `Added ${quantity} ${product.name} to cart!\n\nGo to cart now?`
+    );
+    if (goToCart) {
+      navigate("/cart");
     }
   };
 

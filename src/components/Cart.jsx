@@ -1,91 +1,41 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import { Link } from "react-router-dom";
-import API from "./services/api";
+import { useCart } from "../contexts/CartContext";
+import { useAuth } from "../contexts/AuthContext";
 import "./Cart.css";
 
 export default function Cart() {
-  const [cartItems, setCartItems] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const [summary, setSummary] = useState({
-    subtotal: 0,
-    tax: 0,
-    total: 0,
-  });
-
-  useEffect(() => {
-    fetchCart();
-  }, []);
-
-  const fetchCart = async () => {
-    try {
-      setLoading(true);
-      const [items, summaryData] = await Promise.all([
-        API.getCart(),
-        API.getCartSummary(),
-      ]);
-      setCartItems(items);
-      setSummary({
-        subtotal: summaryData.subtotal,
-        tax: summaryData.tax,
-        total: summaryData.total,
-      });
-      setError(null);
-    } catch (err) {
-      setError("Failed to load cart. Please try again.");
-      console.error(err);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const updateQuantity = async (id, action) => {
-    try {
-      await API.updateCartQuantity(id, action);
-      await fetchCart(); // Refresh cart
-    } catch (err) {
-      console.error("Failed to update quantity:", err);
-      alert("Failed to update quantity. Please try again.");
-    }
-  };
-
-  const removeItem = async (id) => {
-    try {
-      await API.removeFromCart(id);
-      await fetchCart(); // Refresh cart
-    } catch (err) {
-      console.error("Failed to remove item:", err);
-      alert("Failed to remove item. Please try again.");
-    }
-  };
-
-  if (loading) {
-    return (
-      <div className="cart-page">
-        <div className="cart-container">
-          <div className="loading">Loading cart...</div>
-        </div>
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="cart-page">
-        <div className="cart-container">
-          <div className="error-message">{error}</div>
-          <button onClick={fetchCart} className="retry-btn">
-            Retry
-          </button>
-        </div>
-      </div>
-    );
-  }
+  const { cartItems, updateQuantity, removeItem, getCartSummary } = useCart();
+  const { isAuthenticated } = useAuth();
+  const summary = getCartSummary();
 
   return (
     <div className="cart-page">
       <div className="cart-container">
         <h1 className="cart-title">Shopping Cart</h1>
+
+        {!isAuthenticated() && cartItems.length > 0 && (
+          <div className="auth-prompt">
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              width="24"
+              height="24"
+            >
+              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+              <circle cx="12" cy="7" r="4"></circle>
+            </svg>
+            <div className="auth-prompt-text">
+              <strong>Sign in to save your cart</strong>
+              <p>Create an account to access your cart on any device</p>
+            </div>
+            <Link to="/signin" state={{ from: { pathname: "/cart" } }} className="auth-prompt-btn">
+              Sign In
+            </Link>
+          </div>
+        )}
 
         {cartItems.length === 0 ? (
           <div className="empty-cart">

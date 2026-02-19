@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
+import { useCart } from "../contexts/CartContext";
 import API from "./services/api";
 import "./CategoryListing.css";
 
 export default function CategoryListing() {
+  const { addToCart } = useCart();
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [sortBy, setSortBy] = useState("featured");
@@ -27,14 +29,18 @@ export default function CategoryListing() {
     }
   };
 
-  const handleAddToCart = async (e, productId) => {
+  const handleAddToCart = (e, product) => {
     e.preventDefault();
-    try {
-      await API.addToCart(productId, 1);
-      alert("Added to cart!");
-    } catch (error) {
-      alert("Failed to add to cart. Please try again.");
-    }
+    addToCart(
+      {
+        id: product.id,
+        name: product.name,
+        price: product.price,
+        image: product.image,
+      },
+      1
+    );
+    alert(`Added ${product.name} to cart!`);
   };
 
   const handlePageChange = (page) => {
@@ -252,7 +258,7 @@ export default function CategoryListing() {
                   </div>
                   <button
                     className="add-to-cart-btn"
-                    onClick={(e) => handleAddToCart(e, product.id)}
+                    onClick={(e) => handleAddToCart(e, product)}
                   >
                     Add to Cart
                   </button>
