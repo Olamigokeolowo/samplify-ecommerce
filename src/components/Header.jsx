@@ -1,8 +1,19 @@
-import React from "react";
+import React, { useState } from "react";
 import { Link } from "react-router-dom";
+import { useCart } from "../contexts/CartContext";
+import { useAuth } from "../contexts/AuthContext";
 import "./Header.css";
 
 export default function Header() {
+  const { getCartCount } = useCart();
+  const { user, isAuthenticated, logout } = useAuth();
+  const [showUserMenu, setShowUserMenu] = useState(false);
+  const cartCount = getCartCount();
+
+  const handleLogout = () => {
+    logout();
+    setShowUserMenu(false);
+  };
   return (
     <header className="header">
       <div className="header-container">
@@ -63,12 +74,59 @@ export default function Header() {
               <circle cx="20" cy="21" r="1"></circle>
               <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
             </svg>
+            {cartCount > 0 && <span className="cart-badge">{cartCount}</span>}
           </Link>
 
-          {/* Sign In Button */}
-          <Link to="/signin" className="signin-button">
-            Sign In
-          </Link>
+          {/* User Menu or Sign In Button */}
+          {isAuthenticated() ? (
+            <div className="user-menu">
+              <button
+                className="user-button"
+                onClick={() => setShowUserMenu(!showUserMenu)}
+              >
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  width="20"
+                  height="20"
+                >
+                  <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                  <circle cx="12" cy="7" r="4"></circle>
+                </svg>
+                <span className="user-name">{user?.name}</span>
+              </button>
+              {showUserMenu && (
+                <div className="user-dropdown">
+                  <div className="user-dropdown-header">
+                    <strong>{user?.name}</strong>
+                    <span>{user?.email}</span>
+                  </div>
+                  <div className="user-dropdown-divider"></div>
+                  <button onClick={handleLogout} className="logout-button">
+                    <svg
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      width="18"
+                      height="18"
+                    >
+                      <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                      <polyline points="16 17 21 12 16 7"></polyline>
+                      <line x1="21" y1="12" x2="9" y2="12"></line>
+                    </svg>
+                    Logout
+                  </button>
+                </div>
+              )}
+            </div>
+          ) : (
+            <Link to="/signin" className="signin-button">
+              Sign In
+            </Link>
+          )}
         </div>
       </div>
     </header>
