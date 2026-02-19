@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
+import { useCart } from "../contexts/CartContext";
 import API from "./services/api";
 import "./Homepage.css";
 
 export default function Homepage() {
+  const { addToCart } = useCart();
   const [categories, setCategories] = useState([]);
   const [newArrivals, setNewArrivals] = useState([]);
   const [bestSellers, setBestSellers] = useState([]);
@@ -34,13 +36,17 @@ export default function Homepage() {
     }
   };
 
-  const handleAddToCart = async (productId) => {
-    try {
-      await API.addToCart(productId, 1);
-      alert("Added to cart!");
-    } catch (_) {
-      alert("Failed to add to cart. Please try again.");
-    }
+  const handleAddToCart = (product) => {
+    addToCart(
+      {
+        id: product.id,
+        name: product.name,
+        price: product.price,
+        image: product.image,
+      },
+      1
+    );
+    alert(`Added ${product.name} to cart!`);
   };
 
   if (loading) {
@@ -133,7 +139,7 @@ export default function Homepage() {
                 />
                 <button
                   className="quick-view-btn"
-                  onClick={() => handleAddToCart(product.id)}
+                  onClick={() => handleAddToCart(product)}
                 >
                   Add to Cart
                 </button>
@@ -175,7 +181,7 @@ export default function Homepage() {
                 />
                 <button
                   className="quick-view-btn"
-                  onClick={() => handleAddToCart(product.id)}
+                  onClick={() => handleAddToCart(product)}
                 >
                   Add to Cart
                 </button>
