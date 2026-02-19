@@ -9,7 +9,7 @@ import ScrollToTop from "./components/ScrollToTop";
 
 function App() {
   return (
-    <>
+    <div className="App">
       <ScrollToTop />
       <Header />
       <Routes>
@@ -19,7 +19,7 @@ function App() {
         <Route path="/home" element={<Homepage />} />
       </Routes>
       <Footer />
-    </>
+    </div>
   );
 }
 
