@@ -302,50 +302,54 @@
 
 /* Newsletter Section */
 .newsletter-section {
-  background-color: #f8f9fa;
+  background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
   padding: 80px 20px;
   text-align: center;
 }
 
 .newsletter-content {
-  max-width: 600px;
+  max-width: 800px;
   margin: 0 auto;
 }
 
 .newsletter-title {
   font-size: 2.5rem;
   font-weight: 700;
-  margin-bottom: 20px;
-  color: #1a1a1a;
+  margin-bottom: 16px;
+  color: #1976d2;
 }
 
 .newsletter-description {
   font-size: 1.1rem;
-  color: #555;
-  margin-bottom: 30px;
+  color: #424242;
+  margin-bottom: 32px;
   line-height: 1.6;
 }
 
 .newsletter-button {
   display: inline-block;
-  background-color: #1a1a1a;
+  background-color: #1976d2;
   color: white;
-  padding: 16px 40px;
+  padding: 14px 32px;
   text-decoration: none;
-  border-radius: 4px;
+  border-radius: 6px;
   font-weight: 600;
   font-size: 1rem;
   transition: all 0.3s ease;
 }
 
 .newsletter-button:hover {
-  background-color: #333;
+  background-color: #1565c0;
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 4px 12px rgba(25, 118, 210, 0.3);
 }
 
 /* Responsive Design */
 @media (max-width: 968px) {
+  .newsletter-title {
+    font-size: 2rem;
+  }
+
   .hero-content {
     flex-direction: column;
     text-align: center;
@@ -384,5 +388,14 @@
   .category-grid,
   .products-grid {
     grid-template-columns: 1fr;
+  }
+
+  .newsletter-title {
+    font-size: 1.75rem;
+  }
+
+  .newsletter-button {
+    padding: 12px 24px;
+    font-size: 0.95rem;
   }
 }

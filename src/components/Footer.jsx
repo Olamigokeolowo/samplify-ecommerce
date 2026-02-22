@@ -12,20 +12,6 @@ import { FaXTwitter } from "react-icons/fa6";
 export default function Footer() {
   return (
     <footer className="footer">
-      {/* Newsletter Section */}
-      <section className="newsletter-section">
-        <div className="newsletter-content">
-          <h2 className="newsletter-title">Join Our Community</h2>
-          <p className="newsletter-description">
-            Sign up for our newsletter to get exclusive offers, style tips, and
-            updates on new collections.
-          </p>
-          <Link to="/shop" className="newsletter-button">
-            Browse All Products
-          </Link>
-        </div>
-      </section>
-
       {/* Footer Main */}
       <div className="footer-main">
         <div className="footer-container">

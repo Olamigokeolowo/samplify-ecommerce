@@ -1,0 +1,78 @@
+.aboutPage {
+  max-width: 900px;
+  margin: 2rem auto;
+  padding: 1.5rem;
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 2px 16px rgba(0,0,0,0.07);
+  animation: fadeIn 0.5s;
+}
+.hero {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+.subtitle {
+  color: #007bff;
+  font-size: 1.2rem;
+  margin-top: 0.5rem;
+}
+.story, .vision, .features, .invite {
+  margin-bottom: 2rem;
+}
+.vision ul {
+  list-style: disc inside;
+  margin: 1rem 0 0 1rem;
+  color: #444;
+}
+.features {
+  text-align: center;
+}
+.featureCards {
+  display: flex;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-top: 1rem;
+}
+.featureCard {
+  background: #f5f8ff;
+  border-radius: 8px;
+  padding: 1rem 1.5rem;
+  min-width: 220px;
+  box-shadow: 0 1px 6px rgba(0,0,0,0.04);
+  text-align: center;
+  transition: transform 0.2s;
+}
+.featureCard:hover {
+  transform: translateY(-6px) scale(1.03);
+  box-shadow: 0 4px 16px rgba(0,123,255,0.08);
+}
+.invite {
+  text-align: center;
+  color: #388e3c;
+  font-size: 1.1rem;
+}
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(30px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@media (max-width: 900px) {
+  .aboutPage {
+    padding: 1rem 0.5rem;
+    max-width: 100%;
+    border-radius: 10px;
+  }
+  .featureCards {
+    gap: 0.7rem;
+  }
+}
+@media (max-width: 600px) {
+  .aboutPage {
+    padding: 0.5rem 0.2rem;
+    border-radius: 6px;
+  }
+  .featureCard {
+    min-width: 100%;
+    border-radius: 6px;
+  }
+}

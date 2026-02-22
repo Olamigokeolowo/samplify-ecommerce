@@ -9,7 +9,9 @@ import ProductDetail from "./components/ProductDetail";
 import Cart from "./components/Cart";
 import Login from "./components/Login";
 import Signup from "./components/Signup";
+import About from "./components/About";
 import Footer from "./components/Footer";
+import Contact from "./components/Contact";
 import ScrollToTop from "./components/ScrollToTop";
 
 export default function App() {
@@ -26,6 +28,8 @@ export default function App() {
             <Route path="/cart" element={<Cart />} />
             <Route path="/signin" element={<Login />} />
             <Route path="/signup" element={<Signup />} />
+            <Route path="/about" element={<About />} />
+            <Route path="/contact" element={<Contact />} />
           </Routes>
           <Footer />
         </CartProvider>
