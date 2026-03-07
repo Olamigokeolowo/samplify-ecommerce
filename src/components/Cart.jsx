@@ -1,13 +1,23 @@
 import React from "react";
-import { Link } from "react-router-dom";
-import { useCart } from "../contexts/CartContext";
+import { Link, useNavigate } from "react-router-dom";
+import { useCart } from "../contexts/CartContext.js";
 import { useAuth } from "../contexts/AuthContext";
 import "./Cart.css";
 
 export default function Cart() {
   const { cartItems, updateQuantity, removeItem, getCartSummary } = useCart();
   const { isAuthenticated } = useAuth();
+  const navigate = useNavigate();
   const summary = getCartSummary();
+
+  const handleProceedToCheckout = () => {
+    if (!isAuthenticated()) {
+      navigate("/signin", { state: { from: { pathname: "/checkout" } } });
+      return;
+    }
+
+    navigate("/checkout");
+  };
 
   return (
     <div className="cart-page">
@@ -124,7 +134,9 @@ export default function Cart() {
                 <span>Total</span>
                 <span>${summary.total.toFixed(2)}</span>
               </div>
-              <button className="checkout-btn">Proceed to Checkout</button>
+              <button className="checkout-btn" onClick={handleProceedToCheckout}>
+                Proceed to Checkout
+              </button>
               <Link to="/shop" className="continue-link">
                 Continue Shopping
               </Link>

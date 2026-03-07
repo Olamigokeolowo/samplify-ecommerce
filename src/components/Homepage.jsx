@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { useCart } from "../contexts/CartContext";
+import { useCart } from "../contexts/CartContext.js";
 import API from "./services/api";
 import "./Homepage.css";
 
@@ -72,7 +72,7 @@ export default function Homepage() {
               Discover apparel and accessories designed for comfort and
               elegance. Shop the latest trends and timeless classics.
             </p>
-            <Link to="/shop" className="cta-button">
+            <Link to="/CategoryListing" className="cta-button">
               Shop Latest Collections
             </Link>
           </div>

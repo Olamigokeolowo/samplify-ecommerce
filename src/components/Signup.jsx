@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
-import { useCart } from "../contexts/CartContext";
+import { useCart } from "../contexts/CartContext.js";
 import "./Login.css"; // Reusing same styles
 
 export default function Signup() {
@@ -10,6 +10,7 @@ export default function Signup() {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState("");
+  const [successMessage, setSuccessMessage] = useState("");
   const [loading, setLoading] = useState(false);
   const { signup } = useAuth();
   const { mergeCart } = useCart();
@@ -21,6 +22,7 @@ export default function Signup() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
+    setSuccessMessage("");
 
     // Validate passwords match
     if (password !== confirmPassword) {
@@ -32,11 +34,14 @@ export default function Signup() {
 
     try {
       await signup(name, email, password);
-      
+      setSuccessMessage("Welcome onboard!");
+
       // Merge any guest cart items with user's cart
       mergeCart([]);
-      
-      navigate(from, { replace: true });
+
+      setTimeout(() => {
+        navigate(from, { replace: true });
+      }, 900);
     } catch (err) {
       setError(err.message);
     } finally {
@@ -68,6 +73,12 @@ export default function Signup() {
                 <line x1="12" y1="16" x2="12.01" y2="16"></line>
               </svg>
               <span>{error}</span>
+            </div>
+          )}
+
+          {successMessage && (
+            <div className="auth-success">
+              <span>{successMessage}</span>
             </div>
           )}
 

@@ -1,6 +1,9 @@
 import React, { createContext, useState, useEffect, useContext } from "react";
 
 const AuthContext = createContext();
+const AUTH_API_BASE_URL = import.meta.env.DEV
+  ? ""
+  : (import.meta.env.VITE_API_BASE_URL || "http://127.0.0.1:8000");
 
 export const useAuth = () => {
   const context = useContext(AuthContext);
@@ -43,6 +46,61 @@ export const AuthProvider = ({ children }) => {
     return emailRegex.test(email);
   };
 
+  const parseErrorMessage = (data, fallback) => {
+    return (
+      data?.detail ||
+      data?.message ||
+      data?.error ||
+      fallback ||
+      "Request failed"
+    );
+  };
+
+  const buildUserFromResponse = (rawData, fallbackEmail = "") => {
+    const payload = rawData?.user || rawData?.data || rawData || {};
+    const email = payload.email || fallbackEmail;
+    const name =
+      payload.name ||
+      payload.full_name ||
+      payload.username ||
+      (email ? email.split("@")[0] : "User");
+
+    return {
+      id: String(payload.id || payload.user_id || Date.now()),
+      name,
+      email,
+      createdAt: payload.created_at || new Date().toISOString(),
+      token: rawData?.access_token || rawData?.token || payload?.token,
+    };
+  };
+
+  const authRequest = async (path, body, fallbackError) => {
+    let response;
+    try {
+      response = await fetch(`${AUTH_API_BASE_URL}${path}`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(body),
+      });
+    } catch {
+      throw new Error("Network error. Please try again.");
+    }
+
+    let data = null;
+    const contentType = response.headers.get("content-type") || "";
+    if (contentType.includes("application/json")) {
+      data = await response.json();
+    }
+
+    if (!response.ok) {
+      throw new Error(parseErrorMessage(data, fallbackError));
+    }
+
+    return data;
+  };
+
   // Signup function
   const signup = async (name, email, password) => {
     // Validation
@@ -58,31 +116,15 @@ export const AuthProvider = ({ children }) => {
       throw new Error("Password must be at least 6 characters long");
     }
 
-    // Check if user already exists (in localStorage)
-    const existingUsers = JSON.parse(localStorage.getItem("users") || "[]");
-    if (existingUsers.find((u) => u.email === email)) {
-      throw new Error("An account with this email already exists");
-    }
+    const data = await authRequest(
+      "/signup",
+      { name, email, password },
+      "Signup failed",
+    );
 
-    // Create new user
-    const newUser = {
-      id: Date.now().toString(),
-      name,
-      email,
-      createdAt: new Date().toISOString(),
-    };
-
-    // Save to users list (for login validation)
-    existingUsers.push({
-      ...newUser,
-      password, // In production, this would be hashed on the backend
-    });
-    localStorage.setItem("users", JSON.stringify(existingUsers));
-
-    // Set current user (without password)
-    setUser(newUser);
-
-    return newUser;
+    const signedUpUser = buildUserFromResponse(data, email);
+    setUser(signedUpUser);
+    return signedUpUser;
   };
 
   // Login function
@@ -96,21 +138,15 @@ export const AuthProvider = ({ children }) => {
       throw new Error("Please enter a valid email address");
     }
 
-    // Check credentials
-    const existingUsers = JSON.parse(localStorage.getItem("users") || "[]");
-    const foundUser = existingUsers.find(
-      (u) => u.email === email && u.password === password
+    const data = await authRequest(
+      "/login",
+      { email, password },
+      "Invalid email or password",
     );
 
-    if (!foundUser) {
-      throw new Error("Invalid email or password");
-    }
-
-    // Set current user (without password)
-    const { password: _, ...userWithoutPassword } = foundUser;
-    setUser(userWithoutPassword);
-
-    return userWithoutPassword;
+    const loggedInUser = buildUserFromResponse(data, email);
+    setUser(loggedInUser);
+    return loggedInUser;
   };
 
   // Logout function
@@ -139,13 +175,6 @@ export const AuthProvider = ({ children }) => {
 
     setUser(updatedUser);
 
-    // Update in users list
-    const existingUsers = JSON.parse(localStorage.getItem("users") || "[]");
-    const userIndex = existingUsers.findIndex((u) => u.id === user.id);
-    if (userIndex > -1) {
-      existingUsers[userIndex] = { ...existingUsers[userIndex], ...updates };
-      localStorage.setItem("users", JSON.stringify(existingUsers));
-    }
   };
 
   const value = {

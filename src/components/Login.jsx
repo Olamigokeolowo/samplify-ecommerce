@@ -1,13 +1,14 @@
 import React, { useState } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
-import { useCart } from "../contexts/CartContext";
+import { useCart } from "../contexts/CartContext.js";
 import "./Login.css";
 
 export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [successMessage, setSuccessMessage] = useState("");
   const [loading, setLoading] = useState(false);
   const { login } = useAuth();
   const { mergeCart } = useCart();
@@ -19,16 +20,21 @@ export default function Login() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
+    setSuccessMessage("");
     setLoading(true);
 
     try {
-      await login(email, password);
-      
+      const loggedInUser = await login(email, password);
+      const firstName = (loggedInUser?.name || "there").split(" ")[0];
+      setSuccessMessage(`Hi, ${firstName}`);
+
       // Merge any guest cart items with user's cart
       // In a real backend scenario, you'd fetch the user's cart here
       mergeCart([]);
-      
-      navigate(from, { replace: true });
+
+      setTimeout(() => {
+        navigate(from, { replace: true });
+      }, 900);
     } catch (err) {
       setError(err.message);
     } finally {
@@ -63,6 +69,12 @@ export default function Login() {
             </div>
           )}
 
+          {successMessage && (
+            <div className="auth-success">
+              <span>{successMessage}</span>
+            </div>
+          )}
+
           <form onSubmit={handleSubmit} className="auth-form">
             <div className="form-group">
               <label htmlFor="email">Email Address</label>
@@ -87,7 +99,7 @@ export default function Login() {
                 placeholder="Enter your password"
                 required
                 disabled={loading}
-                minLength="6"
+                minLength="2"
               />
             </div>
 

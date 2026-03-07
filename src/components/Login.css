@@ -61,6 +61,18 @@
   line-height: 1.4;
 }
 
+/* Success Message */
+.auth-success {
+  background-color: #e8f5e9;
+  border: 1px solid #66bb6a;
+  border-radius: 8px;
+  padding: 12px 16px;
+  margin-bottom: 24px;
+  color: #2e7d32;
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+
 /* Form */
 .auth-form {
   display: flex;

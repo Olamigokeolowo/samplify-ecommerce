@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Link, useParams, useNavigate } from "react-router-dom";
-import { useCart } from "../contexts/CartContext";
+import { useCart } from "../contexts/CartContext.js";
 import API from "./services/api";
 import "./ProductDetail.css";
 
@@ -57,7 +57,7 @@ export default function ProductDetail() {
 
   const handleAddToCart = () => {
     if (!product) return;
-    
+
     addToCart(
       {
         id: product.id,
@@ -71,7 +71,7 @@ export default function ProductDetail() {
         size: selectedSize,
       }
     );
-    
+
     // Show success message and option to go to cart
     const goToCart = window.confirm(
       `Added ${quantity} ${product.name} to cart!\n\nGo to cart now?`

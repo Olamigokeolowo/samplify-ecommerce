@@ -1,12 +1,33 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
+import { useCart } from "../contexts/CartContext.js";
+import { useAuth } from "../contexts/AuthContext";
 import "./Header.css";
 
 import SearchBar from "./SearchBar";
 
 export default function Header() {
   const [showSearch, setShowSearch] = useState(false);
+  const [showUserMenu, setShowUserMenu] = useState(false);
+  const { getCartCount } = useCart();
+  const { user, isAuthenticated, logout } = useAuth();
+  const cartCount = getCartCount();
+  const [isBumped, setIsBumped] = useState(false);
+  const firstName = user?.name ? user.name.split(" ")[0] : "there";
+
   const handleSearchIconClick = () => setShowSearch((v) => !v);
+
+  // Trigger bump animation when cartCount changes
+  useEffect(() => {
+    // if (cartCount === 0) return;
+    // setIsBumped(true);
+
+    const timer = setTimeout(() => {
+      setIsBumped(false);
+    }, 300);
+
+    return () => clearTimeout(timer);
+  }, [cartCount]);
   return (
     <header className="header">
       <div className="header-container">
@@ -24,7 +45,7 @@ export default function Header() {
 
         <nav className="nav-links">
           <Link to="/" className="nav-link">Home</Link>
-          <Link to="/shop" className="nav-link">Shop</Link>
+          <Link to="/CategoryListing" className="nav-link">Shop</Link>
           <Link to="/about" className="nav-link">About</Link>
           <Link to="/contact" className="nav-link">Contact</Link>
         </nav>
@@ -49,12 +70,12 @@ export default function Header() {
           {/* Inline SearchBar */}
           {showSearch && (
             <div style={{ position: "absolute", top: "60px", right: "120px", zIndex: 10 }}>
-              <SearchBar onSearch={() => {}} />
+              <SearchBar onSearch={() => { }} />
             </div>
           )}
 
           {/* Cart Icon */}
-          <Link to="/cart" className="icon-button cart-button">
+          <Link to="/cart" className={`icon-button cart-button ${isBumped ? "bump" : ""}`}>
             <svg
               viewBox="0 0 24 24"
               fill="none"
@@ -67,12 +88,43 @@ export default function Header() {
               <circle cx="20" cy="21" r="1"></circle>
               <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
             </svg>
+            {cartCount > 0 && <span className="cart-badge">{cartCount}</span>}
           </Link>
 
           {/* Sign In Button */}
-          <Link to="/signin" className="signin-button">
-            Sign In
-          </Link>
+          {isAuthenticated() ? (
+            <div className="user-menu">
+              <button
+                className="user-button"
+                onClick={() => setShowUserMenu((prev) => !prev)}
+              >
+                <span className="user-name">Hi, {firstName}</span>
+              </button>
+
+              {showUserMenu && (
+                <div className="user-dropdown">
+                  <div className="user-dropdown-header">
+                    <strong>{user?.name || "User"}</strong>
+                    <span>{user?.email}</span>
+                  </div>
+                  <div className="user-dropdown-divider"></div>
+                  <button
+                    className="logout-button"
+                    onClick={() => {
+                      logout();
+                      setShowUserMenu(false);
+                    }}
+                  >
+                    Logout
+                  </button>
+                </div>
+              )}
+            </div>
+          ) : (
+            <Link to="/signin" className="signin-button">
+              Sign In
+            </Link>
+          )}
         </div>
       </div>
     </header>
